@@ -50,13 +50,15 @@ class App extends React.Component {
     this.setState({ route: route });
     if (route === "home") {
       this.setState({ isSignedIn: true });
+    } else if (route === "register") {
+      this.setState({ isSignedIn: false });
     } else {
       this.setState(initialState);
     }
   };
 
   onSubmitClick = () => {
-    fetch("http://localhost:3000/imageUrl", {
+    fetch("https://glacial-dawn-85740.herokuapp.com/imageUrl", {
       method: "POST",
       headers: {
         "Content-Type": "Application/json"
@@ -74,7 +76,7 @@ class App extends React.Component {
           id: this.state.user.id
         };
 
-        fetch("http://localhost:3000/image", {
+        fetch("https://glacial-dawn-85740.herokuapp.com/image", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json"

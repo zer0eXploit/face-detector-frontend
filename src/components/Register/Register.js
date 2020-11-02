@@ -29,7 +29,7 @@ export default class Register extends React.Component {
     };
 
     if (data.name && data.email && data.password) {
-      fetch("http://localhost:3000/register", {
+      fetch("https://glacial-dawn-85740.herokuapp.com/register", {
         method: "POST",
         headers: {
           "Content-Type": "Application/json"
