@@ -12,7 +12,7 @@ import Register from "../components/Register/Register";
 const initialState = {
   input: "",
   imageUrl: "",
-  box: "",
+  boxes: [],
   route: "signIn",
   isSignedIn: false,
   user: {
@@ -20,8 +20,8 @@ const initialState = {
     name: "",
     email: "",
     entries: "",
-    joined: ""
-  }
+    joined: "",
+  },
 };
 
 class App extends React.Component {
@@ -30,23 +30,23 @@ class App extends React.Component {
     this.state = initialState;
   }
 
-  updateUser = data => {
+  updateUser = (data) => {
     this.setState({
       user: {
         id: data.id,
         name: data.name,
         email: data.email,
         entries: data.entries,
-        joined: data.joined
-      }
+        joined: data.joined,
+      },
     });
   };
 
-  onUrlInput = event => {
-    this.setState({ imageUrl: event.target.value, box: "" });
+  onUrlInput = (event) => {
+    this.setState({ imageUrl: event.target.value, boxes: [] });
   };
 
-  onRouteChange = route => {
+  onRouteChange = (route) => {
     this.setState({ route: route });
     if (route === "home") {
       this.setState({ isSignedIn: true });
@@ -58,59 +58,66 @@ class App extends React.Component {
   };
 
   onSubmitClick = () => {
-    fetch("https://glacial-dawn-85740.herokuapp.com/imageUrl", {
+    fetch("/imageUrl", {
       method: "POST",
       headers: {
-        "Content-Type": "Application/json"
+        "Content-Type": "Application/json",
       },
       body: JSON.stringify({
-        imageUrl: this.state.imageUrl
-      })
+        imageUrl: this.state.imageUrl,
+      }),
     })
-      .then(response => response.json())
-      .then(response => {
+      .then((response) => response.json())
+      .then((response) => {
         this.boxData(this.calculateFaceLocation(response));
 
         // Upon successful face detection, update entries
         const body = {
-          id: this.state.user.id
+          id: this.state.user.id,
         };
 
-        fetch("https://glacial-dawn-85740.herokuapp.com/image", {
+        fetch("/image", {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
         })
-          .then(res => res.json())
-          .then(data => {
+          .then((res) => res.json())
+          .then((data) => {
             if (data) {
               this.setState(Object.assign(this.state.user, { entries: data }));
             }
           });
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   };
 
-  calculateFaceLocation = data => {
+  calculateFaceLocation = (data) => {
     const imgToDetect = document.getElementById("imgToDetect");
-    const clarifaiData =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
-    const imgHeight = parseInt(imgToDetect.height);
-    // Width is constant set in the jsx code
-    const imgWidth = parseInt(imgToDetect.width);
+    const numberOfFaces = data.outputs[0].data.regions.length;
+    const faceData = [];
 
-    return {
-      topBar: imgHeight * clarifaiData.top_row + "px",
-      leftBar: imgWidth * clarifaiData.left_col + "px",
-      bottomBar: imgHeight - imgHeight * clarifaiData.bottom_row + "px",
-      rightBar: imgWidth - imgWidth * clarifaiData.right_col + "px"
-    };
+    for (let i = 0; i < numberOfFaces; i++) {
+      const clarifaiData =
+        data.outputs[0].data.regions[i].region_info.bounding_box;
+      const imgHeight = parseInt(imgToDetect.height);
+      // Width is constant set in the jsx code
+      const imgWidth = parseInt(imgToDetect.width);
+
+      faceData.push({
+        topBar: imgHeight * clarifaiData.top_row + "px",
+        leftBar: imgWidth * clarifaiData.left_col + "px",
+        bottomBar: imgHeight - imgHeight * clarifaiData.bottom_row + "px",
+        rightBar: imgWidth - imgWidth * clarifaiData.right_col + "px",
+      });
+    }
+
+    return faceData;
   };
 
-  boxData = barPositions => {
-    this.setState({ box: barPositions });
+  boxData = (barPositions) => {
+    this.setState({ boxes: barPositions });
   };
 
   render() {
@@ -133,7 +140,10 @@ class App extends React.Component {
               onUrlInput={this.onUrlInput}
               onSubmitClick={this.onSubmitClick}
             />
-            <ImageDisplay imageUrl={this.state.imageUrl} box={this.state.box} />
+            <ImageDisplay
+              imageUrl={this.state.imageUrl}
+              boxes={this.state.boxes}
+            />
           </div>
         ) : this.state.route === "signIn" ? (
           <SignIn

@@ -6,18 +6,18 @@ export default class Register extends React.Component {
     this.state = {
       name: "",
       email: "",
-      password: ""
+      password: "",
     };
   }
-  onNameChange = evt => {
+  onNameChange = (evt) => {
     this.setState({ name: evt.target.value });
   };
 
-  onEmailChange = evt => {
+  onEmailChange = (evt) => {
     this.setState({ email: evt.target.value });
   };
 
-  onPasswordChange = evt => {
+  onPasswordChange = (evt) => {
     this.setState({ password: evt.target.value });
   };
 
@@ -25,19 +25,19 @@ export default class Register extends React.Component {
     const data = {
       name: this.state.name,
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
     };
 
     if (data.name && data.email && data.password) {
-      fetch("https://glacial-dawn-85740.herokuapp.com/register", {
+      fetch("/register", {
         method: "POST",
         headers: {
-          "Content-Type": "Application/json"
+          "Content-Type": "Application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       })
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.id) {
             this.props.onRouteChange("home");
             this.props.updateUser(data);

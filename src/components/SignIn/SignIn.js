@@ -5,34 +5,34 @@ class SignIn extends React.Component {
     super(props);
     this.state = {
       email: "",
-      password: ""
+      password: "",
     };
   }
 
-  onEmailChange = evt => {
+  onEmailChange = (evt) => {
     this.setState({ email: evt.target.value });
   };
 
-  onPasswordChange = evt => {
+  onPasswordChange = (evt) => {
     this.setState({ password: evt.target.value });
   };
 
   onSubmitClick = () => {
     const data = {
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
     };
 
     if (data.email && data.password) {
-      fetch("https://glacial-dawn-85740.herokuapp.com/signin", {
+      fetch("/signin", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       })
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.id) {
             this.props.updateUser(data);
             this.props.onRouteChange("home");
